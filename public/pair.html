@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pair — Prime Kent Dev Hub</title><meta name="theme-color" content="#07030f">
+<link rel="icon" href="/img/logo.jpg"><link rel="stylesheet" href="/css/style.css"></head><body>
+<div class="wrap">
+  <h1 class="t">Link a <span class="grad">WhatsApp number</span></h1>
+  <p class="lead">Enter the number you want the bot on. We create a pairing code — type it in WhatsApp and you're live.</p>
+  <div class="grid" style="margin-top:24px">
+    <div>
+      <div class="card">
+        <div class="steps" id="steps"><div class="step on" data-s="1"><i></i>Number</div><div class="step" data-s="2"><i></i>Code</div><div class="step" data-s="3"><i></i>Enter in WhatsApp</div><div class="step" data-s="4"><i></i>Live</div></div>
+        <form id="form">
+          <label>WhatsApp number</label>
+          <div class="row"><select id="cc" class="cc"></select><input id="ph" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="712345678" maxlength="16" required></div>
+          <button class="btn" id="go" type="submit">Get my pairing code</button>
+          <div class="hint">Only enter <b>your own</b> number — WhatsApp sends a notification to it.</div>
+        </form>
+        <div id="codeBox" class="hide">
+          <h2 style="margin-top:6px">Your pairing code</h2>
+          <div class="code" id="code">········</div>
+          <button class="btn ghost" id="copy" type="button" style="margin-top:0">📋 Copy code</button>
+          <ol class="how"><li>Open <b>WhatsApp</b> on that phone</li><li><b>Settings → Linked Devices → Link a Device</b></li><li>Tap <b>Link with phone number instead</b></li><li>Type the code above</li></ol>
+          <div class="hint" id="wait">Waiting for you to enter the code… it expires in a few minutes.</div>
+          <button class="btn ghost" id="cancel" type="button">Cancel</button>
+        </div>
+        <div id="doneBox" class="hide"><div class="msg ok" style="font-size:16px">✅ <b>Connected!</b> Open WhatsApp and send <b>.menu</b> in any chat.</div><button class="btn" id="another" type="button">Link another number</button></div>
+        <div id="msg" class="msg hide"></div>
+      </div>
+      <div class="card"><h2>Your linked numbers</h2><div id="list"><div class="hint">Loading…</div></div></div>
+    </div>
+    <div>
+      <div class="card"><h2>Your slots</h2><div class="stats"><div class="stat"><b id="sUsed">0</b><span>Linked</span></div><div class="stat"><b id="sMax">10</b><span>Max</span></div><div class="stat"><b id="sOn">0</b><span>Online</span></div></div><div class="meter"><i id="meter" style="width:0"></i></div></div>
+      <div class="card"><h2>After you connect</h2><ol class="how" style="margin-top:0"><li>Send <b>.menu</b> in any chat</li><li><b>.ping</b> checks it's alive</li><li>Groups: add the number and try <b>.tagall</b>, <b>.lock</b></li><li>Downloads: <b>.play</b> · <b>.video</b> · <b>.tiktok</b></li></ol></div>
+      <div class="card"><h2>Community</h2><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn ghost sm" id="chan" href="#" target="_blank" rel="noopener">📢 WhatsApp channel</a><a class="btn ghost sm" id="tg" href="#" target="_blank" rel="noopener">✈️ Telegram</a></div></div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="/js/config.js"></script><script src="/js/app.js"></script><script src="/js/pair.js"></script>
+</body></html>

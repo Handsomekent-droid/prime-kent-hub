@@ -1,0 +1,38 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Account — Prime Kent Dev Hub</title><meta name="theme-color" content="#07030f">
+<link rel="icon" href="/img/logo.jpg"><link rel="stylesheet" href="/css/style.css"></head><body>
+<div class="wrap">
+  <div class="card hero-acc" style="padding:28px">
+    <div class="av bigav" id="bigav">?</div>
+    <div><h1 class="t" id="hName" style="font-size:clamp(24px,5vw,34px)">…</h1><div class="hint" id="hSub" style="margin-top:6px"></div><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap" id="badges"></div></div>
+  </div>
+  <div class="tabs" id="tabs" style="margin-top:18px"><button class="on" data-p="profile">👤 Profile</button><button data-p="numbers">🔗 Numbers</button><button data-p="settings">⚙️ Settings</button></div>
+
+  <div id="p-profile">
+    <div class="grid">
+      <div class="card"><h2>Account info</h2><div class="kv" id="kv"></div></div>
+      <div class="card"><h2>Quick stats</h2><div class="stats"><div class="stat"><b id="sUsed">0</b><span>Linked</span></div><div class="stat"><b id="sOn">0</b><span>Online</span></div><div class="stat"><b id="sMax">10</b><span>Max</span></div></div><a class="btn" href="/pair" style="display:block;text-align:center;text-decoration:none">🔗 Pair a number</a></div>
+    </div>
+  </div>
+
+  <div id="p-numbers" class="hide"><div class="card"><h2>Linked numbers</h2><div id="list"></div><a class="btn ghost" href="/pair" style="display:block;text-align:center;text-decoration:none">➕ Add another number</a></div></div>
+
+  <div id="p-settings" class="hide">
+    <div class="grid">
+      <div>
+        <div class="card"><h2>Profile</h2><label for="dn">Display name</label><input id="dn" type="text" maxlength="40"><label for="cc">Default country code</label><select id="cc"></select><button class="btn" id="saveP">Save profile</button></div>
+        <div class="card"><h2>Appearance</h2><label>Accent colour</label><div class="sw" id="sw"><button data-a="purple" style="background:#7a2cff;color:#7a2cff" aria-label="Purple"></button><button data-a="red" style="background:#ff1f3d;color:#ff1f3d" aria-label="Red"></button><button data-a="blue" style="background:#1b8cff;color:#1b8cff" aria-label="Blue"></button><button data-a="green" style="background:#12b886;color:#12b886" aria-label="Green"></button></div>
+          <div class="toggle" style="margin-top:14px"><div>Calm mode<small>Turn off the floating background animation</small></div><label class="switch"><input type="checkbox" id="calm"><s></s></label></div></div>
+      </div>
+      <div>
+        <div class="card" id="pwCard"><h2>Security</h2><label for="np">New password</label><input id="np" type="password" minlength="8" autocomplete="new-password" placeholder="At least 8 characters"><button class="btn ghost" id="chgPw">Change password</button><button class="btn ghost" id="outAll">Sign out on all devices</button></div>
+        <div class="card"><h2 style="color:var(--bad)">Danger zone</h2><button class="btn bad" id="unlinkAll" style="margin-top:0">Unlink ALL my numbers</button><button class="btn bad" id="delAcc">Delete my account</button><div class="hint">Deleting removes your account, your settings and every number linked to it.</div></div>
+        <div class="card"><button class="btn ghost" id="out" style="margin-top:0">🚪 Sign out</button></div>
+      </div>
+    </div>
+  </div>
+  <div id="msg" class="msg hide"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="/js/config.js"></script><script src="/js/app.js"></script><script src="/js/account.js"></script>
+</body></html>

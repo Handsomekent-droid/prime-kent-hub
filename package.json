@@ -1,0 +1,7 @@
+{
+  "name": "prime-kent-dev-hub",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Prime Kent Dev Hub — Nexora Nemesis pairing website (Vercel + Supabase)",
+  "engines": { "node": ">=18" }
+}

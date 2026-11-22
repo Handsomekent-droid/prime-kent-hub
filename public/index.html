@@ -1,0 +1,40 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prime Kent Dev Hub — Nexora Nemesis Pairing</title><meta name="theme-color" content="#07030f">
+<meta name="description" content="Link your WhatsApp to Nexora Nemesis 404 MD in seconds. No Telegram needed.">
+<link rel="icon" href="/img/logo.jpg"><link rel="stylesheet" href="/css/style.css"></head><body>
+<div class="wrap" style="padding-top:34px">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:26px"><img src="/img/logo.jpg" alt="" style="width:46px;height:46px;border-radius:50%;box-shadow:0 0 0 2px var(--a1),0 0 22px var(--glow)"><div><b style="font:800 16px Orbitron,sans-serif;letter-spacing:.08em">PRIME KENT DEV HUB</b><div style="font-size:11px;color:var(--a2);letter-spacing:.18em">DEV × PRIME × KILLER × KENT</div></div></div>
+  <div class="grid" style="align-items:center">
+    <div>
+      <span class="pill">⚡ NO TELEGRAM NEEDED</span>
+      <h1 class="t" style="margin-top:16px">Link your WhatsApp to <span class="grad">Nexora Nemesis 404</span></h1>
+      <p class="lead">Create a free account, enter your number, type the pairing code in WhatsApp — your bot is online in seconds. Manage every linked number from one dashboard.</p>
+      <div class="feat"><div>⚡ 440+ commands</div><div>📥 YouTube · TikTok · IG</div><div>🎭 Anime GIF reactions</div><div>🛡 Group admin tools</div><div>🔗 Up to 10 numbers</div><div>🆓 Free to use</div></div>
+    </div>
+    <div class="card" id="authCard">
+      <div class="tabs" id="modeTabs"><button class="on" data-m="signin">Sign in</button><button data-m="signup">Create account</button></div>
+      <button class="btn ghost gbtn" id="google"><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z"/><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.9-4.7l-7.9-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>Continue with Google</button>
+      <div class="sep" id="sep">OR</div>
+      <div class="tabs" id="methodTabs"><button class="on" data-t="email">✉️ Email</button><button data-t="phone">📱 Phone</button></div>
+
+      <form id="emailForm" autocomplete="on">
+        <div id="nameWrap" class="hide"><label for="nm">Your name</label><input id="nm" type="text" autocomplete="name" placeholder="Prime Kent" maxlength="40"></div>
+        <label for="em">Email</label><input id="em" type="email" autocomplete="email" placeholder="you@example.com" required>
+        <label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" placeholder="At least 8 characters" minlength="8" required>
+        <div id="pw2Wrap" class="hide"><label for="pw2">Confirm password</label><input id="pw2" type="password" autocomplete="new-password" placeholder="Repeat password"></div>
+        <button class="btn" id="emailGo" type="submit">Sign in</button>
+        <div class="hint" style="display:flex;justify-content:space-between;gap:10px"><a href="#" id="forgot">Forgot password?</a><a href="#" id="magic">Email me a sign-in link</a></div>
+      </form>
+
+      <form id="phoneForm" class="hide" autocomplete="on">
+        <div id="phStep1"><label>Phone number</label><div class="row"><select id="pcc" class="cc"></select><input id="pph" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="712345678" maxlength="16"></div><button class="btn" id="phSend" type="submit">Send me a code</button><div class="hint">We text a 6-digit code. Works for sign in and sign up.</div></div>
+        <div id="phStep2" class="hide"><label for="otp">6-digit code</label><input id="otp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456"><button class="btn" id="phVerify" type="submit">Verify &amp; continue</button><button class="btn ghost" id="phBack" type="button" style="margin-top:10px">Use another number</button></div>
+      </form>
+      <div id="msg" class="msg hide"></div>
+    </div>
+  </div>
+  <div class="foot">PRIME KENT DEV HUB · NEXORA NEMESIS 404</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="/js/config.js"></script><script src="/js/app.js"></script><script src="/js/login.js"></script>
+</body></html>
