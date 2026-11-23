@@ -53,7 +53,14 @@ SSL in front of the port and use an `https://` URL (set `WEB_TRUST_PROXY=1` on t
    | `SUPABASE_SERVICE_ROLE_KEY` | service_role key (only used by "Delete my account" — keep it secret, never in config.js) |
    | `BOT_API_URL` | `http://IP:PORT` (or your https URL) |
    | `BOT_API_SECRET` | exactly the same text as `WEB_API_SECRET` in the bot |
+   | `ADMIN_EMAILS` | (Build 29) your own sign-in email(s), comma separated. Only these can open the Admin page. |
 3. Deploy. Open your Vercel URL, create an account, pair a number.
+
+## Build 29 update steps
+1. Supabase → SQL Editor → paste the whole `supabase/schema.sql` again → Run (safe to re-run; adds invites, news and help requests).
+2. Vercel → add `ADMIN_EMAILS`, then Redeploy.
+3. Upload the Build 29 bot zip over the old bot files and restart (keep `.env` and `data/`).
+New: Numbers tab (Control, Status, Reconnect, live status), Share tab (invite link, share card, install app), Help tab, News, `/commands` explorer, `/admin`.
 
 ## Safety notes
 - Asking for a code makes WhatsApp notify that number. The bot limits requests (per user, per number, per hour) and every request needs a signed-in account.

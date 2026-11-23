@@ -1,14 +1,15 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Account — Prime Kent Dev Hub</title><meta name="theme-color" content="#07030f">
-<link rel="icon" href="/img/logo.jpg"><link rel="stylesheet" href="/css/style.css"></head><body>
+<link rel="icon" href="/img/logo.jpg"><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/img/icon-192.png"><link rel="stylesheet" href="/css/style.css"></head><body>
 <div class="wrap">
   <div class="card hero-acc" style="padding:28px">
     <div class="av bigav" id="bigav">?</div>
     <div><h1 class="t" id="hName" style="font-size:clamp(24px,5vw,34px)">…</h1><div class="hint" id="hSub" style="margin-top:6px"></div><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap" id="badges"></div></div>
   </div>
-  <div class="tabs" id="tabs" style="margin-top:18px"><button class="on" data-p="profile">👤 Profile</button><button data-p="numbers">🔗 Numbers</button><button data-p="settings">⚙️ Settings</button></div>
+  <div class="tabs" id="tabs" style="margin-top:18px"><button class="on" data-p="profile">👤 Profile</button><button data-p="numbers">🔗 Numbers</button><button data-p="share">🎁 Share</button><button data-p="help">💬 Help</button><button data-p="settings">⚙️ Settings</button></div>
 
   <div id="p-profile">
+    <div class="card hide" id="newsCard"><h2>📣 News</h2><div id="news"></div></div>
     <div class="grid">
       <div class="card"><h2>Account info</h2><div class="kv" id="kv"></div></div>
       <div class="card"><h2>Quick stats</h2><div class="stats"><div class="stat"><b id="sUsed">0</b><span>Linked</span></div><div class="stat"><b id="sOn">0</b><span>Online</span></div><div class="stat"><b id="sMax">10</b><span>Max</span></div></div><a class="btn" href="/pair" style="display:block;text-align:center;text-decoration:none">🔗 Pair a number</a></div>
@@ -16,6 +17,36 @@
   </div>
 
   <div id="p-numbers" class="hide"><div class="card"><h2>Linked numbers</h2><div id="list"></div><a class="btn ghost" href="/pair" style="display:block;text-align:center;text-decoration:none">➕ Add another number</a></div></div>
+
+  <div id="p-share" class="hide">
+    <div class="grid">
+      <div>
+        <div class="card"><h2>🎁 Invite friends</h2><p class="hint" id="refHint">Share your link. When someone signs up with it, your counter goes up.</p>
+          <div class="stats" style="margin:12px 0"><div class="stat"><b id="refN">0</b><span>Friends joined</span></div></div>
+          <div class="copyrow"><input class="fld" id="refLink" readonly><button class="btn" id="refCopy">Copy</button></div>
+          <button class="btn ghost" id="refShare">Share my link</button></div>
+        <div class="card hide" id="instCard"><h2>📲 Install the app</h2><p class="hint">Add Prime Kent Dev Hub to your home screen so it opens like an app.</p><button class="btn" id="instBtn">Install</button></div>
+      </div>
+      <div class="card"><h2>🖼 Share card</h2><p class="hint">A picture with your invite link and QR code. Post it in your status or groups.</p>
+        <canvas class="share" id="card" width="1080" height="1350"></canvas>
+        <button class="btn" id="cardDl">Download picture</button><button class="btn ghost" id="cardSh">Share picture</button></div>
+    </div>
+  </div>
+
+  <div id="p-help" class="hide">
+    <div class="grid">
+      <div class="card"><h2>💬 Ask for help</h2><label for="hs">Subject</label><input class="fld" id="hs" maxlength="80" placeholder="e.g. My number will not connect">
+        <label for="hm">Message</label><textarea class="fld" id="hm" maxlength="800" placeholder="Tell us what happened. Include the number (last 3 digits) and what you saw."></textarea>
+        <button class="btn" id="hSend">Send</button><div class="hint">We read every message. Answers come to your email or the channel.</div></div>
+      <div>
+        <div class="card"><h2>🧾 My requests</h2><div id="tix"><div class="hint">Nothing yet.</div></div></div>
+        <div class="card"><h2>❓ Quick answers</h2>
+          <div class="news"><b>The bot is quiet after pairing</b><small>Give it up to 5 minutes to sync, then send .menu. Or press Reconnect on the Numbers tab.</small></div>
+          <div class="news"><b>The status shows Not connected</b><small>Press Reconnect. If it stays red, remove the number and pair it again.</small></div>
+          <div class="news"><b>How do I see every command?</b><small>Open the <a href="/commands">Commands</a> page or send .menu on WhatsApp.</small></div></div>
+      </div>
+    </div>
+  </div>
 
   <div id="p-settings" class="hide">
     <div class="grid">

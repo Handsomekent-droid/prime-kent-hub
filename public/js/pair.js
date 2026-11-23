@@ -3,7 +3,7 @@
   Hub.chrome();
   const session = await Hub.requireAuth(); if (!session) return;
   const profile = await Hub.loadProfile(session.user);
-  Hub.applyPrefs(profile.settings); Hub.nav('pair', session, profile); Hub.footer();
+  await Hub.checkAdmin(); Hub.applyPrefs(profile.settings); Hub.nav('pair', session, profile); Hub.footer();
   $('chan').href = cfg.CHANNEL || '#'; $('tg').href = cfg.TELEGRAM || '#';
 
   Hub.COUNTRIES.forEach(([c, l]) => { const o = el('option', { value: c, text: l }); $('cc').append(o); });

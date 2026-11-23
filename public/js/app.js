@@ -22,6 +22,11 @@
     document.documentElement.setAttribute('data-calm', calm ? 'on' : 'off');
   }
   applyPrefs();
+  try { const rf = new URLSearchParams(location.search).get('ref'); if (rf && /^[a-f0-9]{8}$/.test(rf)) localStorage.setItem('pk_ref', rf); } catch {}
+  if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+  let installEvt = null;
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvt = e; document.dispatchEvent(new Event('pk-installable')); });
+  const install = async () => { if (!installEvt) return false; installEvt.prompt(); try { await installEvt.userChoice; } catch {} installEvt = null; return true; };
 
   function chrome() {
     if (!$('bgfx')) document.body.prepend(el('div', { class: 'bg', id: 'bgfx' }), el('div', { class: 'orb o1' }), el('div', { class: 'orb o2' }));
@@ -57,18 +62,23 @@
 
   function nav(active, session, profile) {
     const u = session?.user; const name = profile?.display_name || displayName(u);
+    let isAdm = false; try { isAdm = sessionStorage.getItem('pk_admin') === '1'; } catch {}
     const header = el('header', { class: 'nav' });
     header.append(
       el('a', { class: 'brand', href: '/' }, el('img', { src: '/img/logo.jpg', alt: '' }), el('div', {}, el('b', { text: 'PRIME KENT DEV HUB' }), el('small', { text: 'Nexora Nemesis Pairing' }))),
       el('a', { class: 'l' + (active === 'pair' ? ' on' : ''), href: '/pair' }, '🔗 ', el('span', { text: 'Pair' })),
+      el('a', { class: 'l' + (active === 'cmds' ? ' on' : ''), href: '/commands' }, '📚 ', el('span', { text: 'Commands' })),
       el('a', { class: 'l' + (active === 'account' ? ' on' : ''), href: '/account' }, '👤 ', el('span', { text: 'Account' }))
     );
+    if (isAdm) header.append(el('a', { class: 'l' + (active === 'admin' ? ' on' : ''), href: '/admin' }, '🛡 ', el('span', { text: 'Admin' })));
+    if (!u) { header.append(el('a', { class: 'btn sm', href: '/', style: 'width:auto;margin:0;padding:9px 14px;text-decoration:none', text: 'Sign in' })); document.body.prepend(header); return; }
     const av = el('button', { class: 'av', 'aria-label': 'Account menu' });
     const pic = u?.user_metadata?.avatar_url || u?.user_metadata?.picture;
     if (pic) av.append(el('img', { src: pic, alt: '', referrerpolicy: 'no-referrer' })); else av.textContent = (name[0] || '?').toUpperCase();
     const menu = el('div', { class: 'menu', id: 'menu' },
       el('div', { class: 'who', text: u?.email || (u?.phone ? '+' + u.phone : name) }),
-      el('a', { href: '/pair', text: '🔗 Pair a number' }), el('a', { href: '/account', text: '👤 My account' }), el('a', { href: '/account#settings', text: '⚙️ Settings' }),
+      el('a', { href: '/pair', text: '🔗 Pair a number' }), el('a', { href: '/commands', text: '📚 Commands' }), el('a', { href: '/account', text: '👤 My account' }), el('a', { href: '/account#settings', text: '⚙️ Settings' }),
+      ...(isAdm ? [el('a', { href: '/admin', text: '🛡 Admin' })] : []),
       el('button', { text: '🚪 Sign out', onclick: signOut }));
     av.onclick = (e) => { e.stopPropagation(); menu.classList.toggle('open'); };
     document.addEventListener('click', () => menu.classList.remove('open'));
@@ -85,7 +95,19 @@
     return d;
   }
 
+  // is this person an admin? (asked once per browser session; the server decides, the page only shows a link)
+  async function checkAdmin() {
+    try { const c = sessionStorage.getItem('pk_admin'); if (c !== null) return c === '1'; } catch {}
+    try {
+      const s = await getSession(); if (!s) return false;
+      const r = await fetch('/api/admin?action=whoami', { headers: { Authorization: 'Bearer ' + s.access_token } });
+      const d = await r.json(); const a = !!(d && d.admin);
+      try { sessionStorage.setItem('pk_admin', a ? '1' : '0'); } catch {}
+      return a;
+    } catch { return false; }
+  }
+
   function footer() { document.body.append(el('div', { class: 'foot', text: 'PRIME KENT DEV HUB · NEXORA NEMESIS 404 · DEV × PRIME × KILLER × KENT' })); }
 
-  window.Hub = { cfg, sb, configured, $, el, toast, chrome, getSession, requireAuth, displayName, loadProfile, saveProfile, nav, signOut, api, applyPrefs, COUNTRIES, footer };
+  window.Hub = { checkAdmin, install, canInstall: () => !!installEvt, cfg, sb, configured, $, el, toast, chrome, getSession, requireAuth, displayName, loadProfile, saveProfile, nav, signOut, api, applyPrefs, COUNTRIES, footer };
 })();

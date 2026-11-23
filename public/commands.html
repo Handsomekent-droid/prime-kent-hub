@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Commands — Prime Kent Dev Hub</title><meta name="description" content="Every Nexora Nemesis 404 MD command, searchable.">
+<meta name="theme-color" content="#07030f"><link rel="icon" href="/img/logo.jpg"><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/img/icon-192.png"><link rel="stylesheet" href="/css/style.css"></head><body>
+<div class="wrap">
+  <div class="card" style="padding:26px">
+    <h1 class="t" style="font-size:clamp(24px,5vw,34px)">📚 Command explorer</h1>
+    <p class="hint" id="sum" style="margin-top:6px">Loading…</p>
+    <input class="fld" id="q" type="search" placeholder="Search a command, e.g. play, sticker, kick…" autocomplete="off" style="margin-top:14px">
+  </div>
+  <div class="card" id="tips"><h2>⚡ Start here</h2>
+    <div class="cmd"><div class="m"><code>.menu</code><p>Open the main menu with every category.</p></div></div>
+    <div class="cmd"><div class="m"><code>.ping</code><p>Check that the bot is alive and fast.</p></div></div>
+    <div class="cmd"><div class="m"><code>.play &lt;song name&gt;</code><p>Download a song from YouTube.</p></div></div>
+    <div class="cmd"><div class="m"><code>.sticker</code><p>Reply to a picture or short video to make a sticker.</p></div></div>
+    <div class="cmd"><div class="m"><code>.vv</code><p>Reply to a view-once photo or video to open it.</p></div></div>
+    <div class="cmd"><div class="m"><code>.autosettings</code><p>See every automatic feature and switch them on or off.</p></div></div>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div id="list"></div>
+  <div class="hint" id="none" style="display:none;text-align:center;padding:18px">No command matches that. Try another word.</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="/js/config.js"></script><script src="/js/app.js"></script><script src="/js/commands.js"></script>
+</body></html>
