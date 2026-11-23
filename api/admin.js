@@ -70,6 +70,31 @@ module.exports = async (req, res) => {
       const r = await supa('/rest/v1/support_tickets?id=eq.' + id, { method: 'PATCH', body: { status }, prefer: 'return=minimal' });
       return send(res, r.ok ? 200 : 502, { ok: r.ok });
     }
+    if (action === 'posts') {
+      const r = await supa('/rest/v1/posts?select=*&order=created_at.desc&limit=60');
+      return send(res, r.ok ? 200 : 502, { ok: r.ok, items: r.data || [], msg: r.ok ? '' : 'Run the new SQL (supabase/schema.sql) first.' });
+    }
+    if (action === 'delete-post' && req.method === 'POST') {
+      const id = parseInt(b.id, 10); if (!Number.isInteger(id)) return send(res, 400, { ok: false });
+      const r = await supa('/rest/v1/posts?id=eq.' + id, { method: 'DELETE', prefer: 'return=minimal' });
+      return send(res, r.ok ? 200 : 502, { ok: r.ok });
+    }
+    if (action === 'polls') {
+      const r = await supa('/rest/v1/polls?select=*&order=created_at.desc&limit=30');
+      return send(res, r.ok ? 200 : 502, { ok: r.ok, items: r.data || [], msg: r.ok ? '' : 'Run the new SQL (supabase/schema.sql) first.' });
+    }
+    if (action === 'create-poll' && req.method === 'POST') {
+      const question = String(b.question || '').trim().slice(0, 140);
+      const options = (Array.isArray(b.options) ? b.options : []).map((x) => String(x || '').trim().slice(0, 60)).filter(Boolean).slice(0, 6);
+      if (!question || options.length < 2) return send(res, 400, { ok: false, msg: 'Add a question and at least 2 options.' });
+      const r = await supa('/rest/v1/polls', { method: 'POST', body: { question, options }, prefer: 'return=minimal' });
+      return send(res, r.ok ? 200 : 502, { ok: r.ok, msg: r.ok ? '' : 'Could not save. Run the new SQL first.' });
+    }
+    if (action === 'delete-poll' && req.method === 'POST') {
+      const id = parseInt(b.id, 10); if (!Number.isInteger(id)) return send(res, 400, { ok: false });
+      const r = await supa('/rest/v1/polls?id=eq.' + id, { method: 'DELETE', prefer: 'return=minimal' });
+      return send(res, r.ok ? 200 : 502, { ok: r.ok });
+    }
     return send(res, 404, { ok: false, msg: 'Unknown action.' });
   } catch (e) { send(res, 500, { ok: false, msg: 'Server error.' }); }
 };

@@ -7,13 +7,13 @@
   try { sessionStorage.setItem('pk_admin', '1'); } catch {}
   Hub.nav('admin', session, null); Hub.footer();
 
-  const TABS = ['ov', 'us', 'nu', 'an', 'tk']; const loaded = {};
+  const TABS = ['ov', 'us', 'nu', 'an', 'tk', 'wl', 'pl']; const loaded = {};
   const fmt = (t) => (t ? new Date(t).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: '2-digit' }) : '—');
   const up = (s) => { const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60); return (d ? d + 'd ' : '') + h + 'h ' + m + 'm'; };
   function tab(p) {
     document.querySelectorAll('#tabs button').forEach((b) => b.classList.toggle('on', b.dataset.p === p));
     TABS.forEach((x) => $('p-' + x).classList.toggle('hide', x !== p));
-    ({ ov: overview, us: users, nu: numbers, an: news, tk: tickets })[p]();
+    ({ ov: overview, us: users, nu: numbers, an: news, tk: tickets, wl: wall, pl: polls })[p]();
   }
   document.querySelectorAll('#tabs button').forEach((b) => (b.onclick = () => tab(b.dataset.p)));
 
@@ -68,5 +68,25 @@
     d.items.forEach((t) => box.append(el('div', { class: 'news' }, el('b', { text: t.subject }), el('div', { text: t.message }), el('small', { text: `${t.email || ''} · ${fmt(t.created_at)} · ${t.status} ` }),
       el('button', { class: 'mini', text: t.status === 'closed' ? 'Reopen' : 'Close', onclick: async () => { await api('admin?action=ticket-status', { method: 'POST', body: { id: t.id, status: t.status === 'closed' ? 'open' : 'closed' } }); tickets(); } }))));
   }
+  async function wall() {
+    const d = await api('admin?action=posts'); const box = $('wl'); box.textContent = '';
+    if (!d.ok) return box.append(el('div', { class: 'hint', text: d.msg || 'Could not load' }));
+    if (!d.items.length) box.append(el('div', { class: 'hint', text: 'No posts yet.' }));
+    d.items.forEach((p) => box.append(el('div', { class: 'news' }, el('b', { text: p.author }), el('div', { text: p.body }), el('small', { text: `${fmt(p.created_at)} · ❤️ ${p.likes} ` }),
+      el('button', { class: 'mini bad', text: 'Delete', onclick: async () => { if (!confirm('Delete this post?')) return; await api('admin?action=delete-post', { method: 'POST', body: { id: p.id } }); wall(); } }))));
+  }
+  async function polls() {
+    const d = await api('admin?action=polls'); const box = $('pls'); box.textContent = '';
+    if (!d.ok) return box.append(el('div', { class: 'hint', text: d.msg || 'Could not load' }));
+    if (!d.items.length) box.append(el('div', { class: 'hint', text: 'No polls yet.' }));
+    d.items.forEach((p) => box.append(el('div', { class: 'news' }, el('b', { text: p.question }), el('small', { text: (p.options || []).join(' · ') + ' ' }),
+      el('button', { class: 'mini bad', text: 'Delete', onclick: async () => { if (!confirm('Delete this poll?')) return; await api('admin?action=delete-poll', { method: 'POST', body: { id: p.id } }); polls(); } }))));
+  }
+  $('pGo').onclick = async () => {
+    const options = [...document.querySelectorAll('.po')].map((i) => i.value.trim()).filter(Boolean);
+    const r = await api('admin?action=create-poll', { method: 'POST', body: { question: $('pq').value, options } });
+    if (!r.ok) return toast(r.msg || 'Could not publish', 'err');
+    $('pq').value = ''; document.querySelectorAll('.po').forEach((i) => (i.value = '')); toast('Poll published ✓'); polls();
+  };
   tab('ov');
 })();

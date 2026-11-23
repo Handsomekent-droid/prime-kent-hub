@@ -1,0 +1,33 @@
+{
+  "projects": [
+    {
+      "icon": "🤖", "name": "Nexora Nemesis 404 MD", "tag": "WhatsApp + Telegram bot", "status": "live",
+      "desc": "A multi-session WhatsApp bot with 440+ commands: downloads, stickers, group tools, anime reactions, auto features and more. Link up to 10 numbers per account.",
+      "features": ["440+ commands", "Downloads", "Group admin tools", "Auto features", "10 numbers"],
+      "links": [
+        { "label": "Pair my number", "href": "/pair", "primary": true },
+        { "label": "Commands", "href": "/commands" },
+        { "label": "Telegram bot", "href": "https://t.me/NexoraNemesisXBot" },
+        { "label": "WhatsApp channel", "href": "@channel" }
+      ]
+    },
+    {
+      "icon": "🛠", "name": "Free Tools", "tag": "Prime Kent Dev Hub", "status": "live",
+      "desc": "Handy tools that run right in your browser: fancy text styler, QR maker, WhatsApp link maker, image shrinker, short links and status ideas.",
+      "features": ["Text styler", "QR codes", "wa.me links", "Image shrink", "Short links"],
+      "links": [{ "label": "Open tools", "href": "/tools", "primary": true }]
+    },
+    {
+      "icon": "🌐", "name": "Community", "tag": "Prime Kent Dev Hub", "status": "live",
+      "desc": "Post on the wall, vote in polls and climb the top-inviters board.",
+      "features": ["Wall", "Polls", "Leaderboard"],
+      "links": [{ "label": "Join in", "href": "/community", "primary": true }]
+    },
+    {
+      "icon": "🚀", "name": "More coming soon", "tag": "In the works", "status": "soon",
+      "desc": "New bots and tools are on the way. Follow the channel to be first to know.",
+      "features": [],
+      "links": [{ "label": "Follow the channel", "href": "@channel" }]
+    }
+  ]
+}

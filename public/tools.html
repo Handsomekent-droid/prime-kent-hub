@@ -1,0 +1,34 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Free tools — Prime Kent Dev Hub</title><meta name="description" content="Fancy text, QR codes, WhatsApp links, image shrinker, short links and more. Free.">
+<meta name="theme-color" content="#07030f"><link rel="icon" href="/img/logo.jpg"><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/img/icon-192.png"><link rel="stylesheet" href="/css/style.css"></head><body>
+<div class="wrap">
+  <div class="card" style="padding:26px"><h1 class="t" style="font-size:clamp(24px,5vw,34px)">🛠 Free tools</h1><p class="hint" style="margin-top:6px">Everything runs in your browser. Nothing is uploaded, except short links.</p></div>
+  <div class="chips" id="chips"></div>
+
+  <section id="t-style" class="card"><h2>✨ Fancy text</h2><input class="fld" id="sIn" maxlength="120" placeholder="Type your name or a sentence…" value="Prime Kent"><div id="sOut"></div></section>
+
+  <section id="t-qr" class="card hide"><h2>📱 QR code maker</h2><textarea class="fld" id="qIn" maxlength="500" placeholder="A link, text, phone number…">https://prime-kent-hub.vercel.app</textarea>
+    <div style="display:flex;gap:10px;margin-top:8px"><label style="flex:1">Dots<input type="color" id="qFg" value="#12062b" class="fld" style="padding:4px;height:44px"></label><label style="flex:1">Background<input type="color" id="qBg" value="#ffffff" class="fld" style="padding:4px;height:44px"></label></div>
+    <canvas id="qCv" class="share" width="320" height="320"></canvas><div class="hint" id="qMsg" style="text-align:center"></div><button class="btn" id="qDl">Download PNG</button></section>
+
+  <section id="t-wa" class="card hide"><h2>💬 WhatsApp link maker</h2><p class="hint">Make a link that opens a chat with your number (and an optional message).</p>
+    <div style="display:flex;gap:8px"><select class="fld" id="wCc" style="max-width:130px"></select><input class="fld" id="wNum" type="tel" inputmode="numeric" placeholder="712345678" maxlength="15"></div>
+    <textarea class="fld" id="wMsg" maxlength="300" placeholder="Message (optional)"></textarea>
+    <div class="out"><span id="wOut">—</span><button class="mini" id="wCopy">Copy</button></div><a class="btn ghost" id="wOpen" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">Open chat</a></section>
+
+  <section id="t-img" class="card hide"><h2>🖼 Image shrinker</h2><p class="hint">Make a picture smaller to send faster or fit a size limit.</p>
+    <input class="fld" type="file" id="iFile" accept="image/*"><label>Biggest side</label><select class="fld" id="iMax"><option value="480">480 px</option><option value="720">720 px</option><option value="1080" selected>1080 px</option><option value="1600">1600 px</option><option value="0">Keep size</option></select>
+    <label>Quality: <b id="iQv">75</b>%</label><input type="range" id="iQ" min="30" max="95" value="75" style="width:100%">
+    <div class="hint" id="iInfo"></div><img id="iPrev" alt="" style="max-width:100%;border-radius:12px;display:none;margin-top:8px"><button class="btn hide" id="iDl">Download</button></section>
+
+  <section id="t-link" class="card hide"><h2>🔗 Short links</h2><div id="lGuest" class="hide"><p class="hint">Sign in to make short links.</p><a class="btn" href="/?next=/tools" style="display:block;text-align:center;text-decoration:none">Sign in</a></div>
+    <div id="lApp" class="hide"><input class="fld" id="lUrl" type="url" placeholder="https://a-very-long-link.com/…"><input class="fld" id="lCode" maxlength="24" placeholder="Custom name (optional, letters and numbers)"><button class="btn" id="lGo">Shorten</button><div id="lOut"></div><div class="sub">My links</div><div id="lList"></div></div></section>
+
+  <section id="t-text" class="card hide"><h2>🔤 Text tools</h2><textarea class="fld" id="xIn" maxlength="5000" style="min-height:120px" placeholder="Paste text here…"></textarea><div class="hint" id="xCount">0 characters · 0 words · 0 lines</div>
+    <div class="chips" id="xBtns" style="flex-wrap:wrap"></div><button class="btn ghost" id="xCopy">Copy text</button></section>
+
+  <section id="t-idea" class="card hide"><h2>🎲 Status ideas</h2><div class="chips" id="gChips"></div><div class="sty"><div id="gText"></div></div><div style="display:flex;gap:8px"><button class="btn" id="gNew" style="margin-top:12px">Another one</button><button class="btn ghost" id="gCopy" style="margin-top:12px">Copy</button></div></section>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="/js/config.js"></script><script src="/js/app.js"></script><script src="/js/tools.js"></script>
+</body></html>

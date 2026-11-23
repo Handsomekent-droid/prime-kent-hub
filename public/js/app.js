@@ -60,16 +60,13 @@
     if (error) throw error;
   }
 
+  const NAV = [['projects', '🏠', 'Projects', '/projects'], ['pair', '🔗', 'Pair', '/pair'], ['tools', '🛠', 'Tools', '/tools'], ['community', '🌐', 'Community', '/community'], ['cmds', '📚', 'Commands', '/commands'], ['account', '👤', 'Account', '/account']];
   function nav(active, session, profile) {
     const u = session?.user; const name = profile?.display_name || displayName(u);
     let isAdm = false; try { isAdm = sessionStorage.getItem('pk_admin') === '1'; } catch {}
     const header = el('header', { class: 'nav' });
-    header.append(
-      el('a', { class: 'brand', href: '/' }, el('img', { src: '/img/logo.jpg', alt: '' }), el('div', {}, el('b', { text: 'PRIME KENT DEV HUB' }), el('small', { text: 'Nexora Nemesis Pairing' }))),
-      el('a', { class: 'l' + (active === 'pair' ? ' on' : ''), href: '/pair' }, '🔗 ', el('span', { text: 'Pair' })),
-      el('a', { class: 'l' + (active === 'cmds' ? ' on' : ''), href: '/commands' }, '📚 ', el('span', { text: 'Commands' })),
-      el('a', { class: 'l' + (active === 'account' ? ' on' : ''), href: '/account' }, '👤 ', el('span', { text: 'Account' }))
-    );
+    header.append(el('a', { class: 'brand', href: '/' }, el('img', { src: '/img/logo.jpg', alt: '' }), el('div', {}, el('b', { text: 'PRIME KENT DEV HUB' }), el('small', { text: 'Nexora Nemesis Pairing' }))));
+    NAV.forEach(([k, ic, tx, href]) => header.append(el('a', { class: 'l' + (active === k ? ' on' : ''), href }, ic + ' ', el('span', { text: tx }))));
     if (isAdm) header.append(el('a', { class: 'l' + (active === 'admin' ? ' on' : ''), href: '/admin' }, '🛡 ', el('span', { text: 'Admin' })));
     if (!u) { header.append(el('a', { class: 'btn sm', href: '/', style: 'width:auto;margin:0;padding:9px 14px;text-decoration:none', text: 'Sign in' })); document.body.prepend(header); return; }
     const av = el('button', { class: 'av', 'aria-label': 'Account menu' });
@@ -77,7 +74,7 @@
     if (pic) av.append(el('img', { src: pic, alt: '', referrerpolicy: 'no-referrer' })); else av.textContent = (name[0] || '?').toUpperCase();
     const menu = el('div', { class: 'menu', id: 'menu' },
       el('div', { class: 'who', text: u?.email || (u?.phone ? '+' + u.phone : name) }),
-      el('a', { href: '/pair', text: '🔗 Pair a number' }), el('a', { href: '/commands', text: '📚 Commands' }), el('a', { href: '/account', text: '👤 My account' }), el('a', { href: '/account#settings', text: '⚙️ Settings' }),
+      ...NAV.filter((n) => n[0] !== 'account').map((n) => el('a', { href: n[3], text: n[1] + ' ' + n[2] })), el('a', { href: '/account', text: '👤 My account' }), el('a', { href: '/account#settings', text: '⚙️ Settings' }),
       ...(isAdm ? [el('a', { href: '/admin', text: '🛡 Admin' })] : []),
       el('button', { text: '🚪 Sign out', onclick: signOut }));
     av.onclick = (e) => { e.stopPropagation(); menu.classList.toggle('open'); };

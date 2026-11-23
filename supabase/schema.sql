@@ -91,3 +91,123 @@ drop policy if exists "own ticket insert" on public.support_tickets;
 drop policy if exists "own ticket read" on public.support_tickets;
 create policy "own ticket insert" on public.support_tickets for insert to authenticated with check (auth.uid() = user_id);
 create policy "own ticket read" on public.support_tickets for select to authenticated using (auth.uid() = user_id);
+
+-- ===== Build 30: community wall, polls, leaderboard, link shortener (safe to re-run) =====
+
+-- wall posts
+create table if not exists public.posts (
+  id bigint generated always as identity primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  author text not null,
+  avatar text,
+  body text not null check (char_length(body) between 1 and 280),
+  likes integer not null default 0,
+  created_at timestamptz not null default now()
+);
+alter table public.posts enable row level security;
+drop policy if exists "read posts" on public.posts;
+drop policy if exists "insert own post" on public.posts;
+drop policy if exists "delete own post" on public.posts;
+create policy "read posts" on public.posts for select to authenticated using (true);
+create policy "insert own post" on public.posts for insert to authenticated with check (auth.uid() = user_id and likes = 0);
+create policy "delete own post" on public.posts for delete to authenticated using (auth.uid() = user_id);
+-- one post per 20 seconds per person
+create or replace function public.posts_rate() returns trigger language plpgsql as $$
+begin
+  if exists (select 1 from public.posts where user_id = new.user_id and created_at > now() - interval '20 seconds') then
+    raise exception 'Slow down: wait a few seconds between posts';
+  end if;
+  return new;
+end $$;
+drop trigger if exists posts_rate_t on public.posts;
+create trigger posts_rate_t before insert on public.posts for each row execute function public.posts_rate();
+
+create table if not exists public.post_likes (
+  post_id bigint not null references public.posts(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  primary key (post_id, user_id)
+);
+alter table public.post_likes enable row level security;
+drop policy if exists "read own likes" on public.post_likes;
+create policy "read own likes" on public.post_likes for select to authenticated using (auth.uid() = user_id);
+
+create or replace function public.toggle_like(pid bigint) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare liked boolean; n integer;
+begin
+  if auth.uid() is null then raise exception 'sign in first'; end if;
+  if exists (select 1 from post_likes where post_id = pid and user_id = auth.uid()) then
+    delete from post_likes where post_id = pid and user_id = auth.uid(); liked := false;
+  else
+    insert into post_likes(post_id, user_id) values (pid, auth.uid()); liked := true;
+  end if;
+  update posts set likes = (select count(*) from post_likes where post_id = pid) where id = pid returning likes into n;
+  return jsonb_build_object('liked', liked, 'likes', coalesce(n, 0));
+end $$;
+grant execute on function public.toggle_like(bigint) to authenticated;
+
+-- polls (created by the admin page)
+create table if not exists public.polls (
+  id bigint generated always as identity primary key,
+  question text not null,
+  options jsonb not null,
+  created_at timestamptz not null default now()
+);
+alter table public.polls enable row level security;
+drop policy if exists "read polls" on public.polls;
+create policy "read polls" on public.polls for select to authenticated using (true);
+
+create table if not exists public.poll_votes (
+  poll_id bigint not null references public.polls(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  choice integer not null,
+  primary key (poll_id, user_id)
+);
+alter table public.poll_votes enable row level security;
+drop policy if exists "read own vote" on public.poll_votes;
+drop policy if exists "vote once" on public.poll_votes;
+create policy "read own vote" on public.poll_votes for select to authenticated using (auth.uid() = user_id);
+create policy "vote once" on public.poll_votes for insert to authenticated with check (auth.uid() = user_id);
+
+create or replace function public.poll_results(pid bigint) returns jsonb
+language sql security definer set search_path = public as $$
+  select coalesce(jsonb_object_agg(choice::text, n), '{}'::jsonb) from (select choice, count(*)::int n from poll_votes where poll_id = pid group by choice) t;
+$$;
+grant execute on function public.poll_results(bigint) to authenticated;
+
+-- top inviters (people can hide themselves in Account → Settings)
+create or replace function public.top_inviters() returns table(name text, n integer)
+language sql security definer set search_path = public as $$
+  select coalesce(p.display_name, 'Member') as name, count(r.id)::int as n
+  from public.profiles p join public.profiles r on r.referred_by = p.ref_code
+  where coalesce(p.settings->>'hideBoard', 'false') <> 'true'
+  group by p.id, p.display_name order by n desc, p.display_name limit 10;
+$$;
+grant execute on function public.top_inviters() to authenticated;
+
+-- short links  (/s/<code>)
+create table if not exists public.short_links (
+  code text primary key check (code ~ '^[a-zA-Z0-9_-]{3,24}$'),
+  url text not null check (url ~* '^https?://' and char_length(url) <= 2000),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  clicks integer not null default 0,
+  created_at timestamptz not null default now()
+);
+alter table public.short_links enable row level security;
+drop policy if exists "read short links" on public.short_links;
+drop policy if exists "insert own link" on public.short_links;
+drop policy if exists "delete own link" on public.short_links;
+create policy "read short links" on public.short_links for select using (true);
+create policy "insert own link" on public.short_links for insert to authenticated with check (auth.uid() = user_id and clicks = 0);
+create policy "delete own link" on public.short_links for delete to authenticated using (auth.uid() = user_id);
+-- at most 50 links per person
+create or replace function public.links_cap() returns trigger language plpgsql as $$
+begin
+  if (select count(*) from public.short_links where user_id = new.user_id) >= 50 then raise exception 'You can keep up to 50 short links. Delete one first.'; end if;
+  return new;
+end $$;
+drop trigger if exists links_cap_t on public.short_links;
+create trigger links_cap_t before insert on public.short_links for each row execute function public.links_cap();
+create or replace function public.link_click(c text) returns void
+language sql security definer set search_path = public as $$ update public.short_links set clicks = clicks + 1 where code = c; $$;
+grant execute on function public.link_click(text) to anon, authenticated;

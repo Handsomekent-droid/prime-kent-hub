@@ -3,13 +3,15 @@
 <link rel="icon" href="/img/logo.jpg"><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/img/icon-192.png"><link rel="stylesheet" href="/css/style.css"></head><body>
 <div class="wrap">
   <div class="card" style="padding:24px"><h1 class="t" style="font-size:clamp(22px,5vw,32px)">🛡 Admin</h1><p class="hint" style="margin-top:6px">Owner tools: see everything, remove numbers, post news, read help requests.</p></div>
-  <div class="tabs" id="tabs"><button class="on" data-p="ov">📊 Overview</button><button data-p="us">👥 Users</button><button data-p="nu">📱 Numbers</button><button data-p="an">📣 News</button><button data-p="tk">🧾 Help</button></div>
+  <div class="tabs" id="tabs"><button class="on" data-p="ov">📊 Overview</button><button data-p="us">👥 Users</button><button data-p="nu">📱 Numbers</button><button data-p="an">📣 News</button><button data-p="tk">🧾 Help</button><button data-p="wl">💬 Wall</button><button data-p="pl">🗳 Polls</button></div>
 
   <div id="p-ov"><div class="card"><div class="kpis" id="kpis"></div><div class="hint" id="ovNote" style="margin-top:12px"></div></div></div>
   <div id="p-us" class="hide"><div class="card"><h2>Accounts</h2><input class="fld" id="uq" type="search" placeholder="Search email…"><div class="scroll" style="margin-top:10px"><table class="tbl"><thead><tr><th>Account</th><th>Numbers</th><th>Joined</th><th></th></tr></thead><tbody id="ut"></tbody></table></div></div></div>
   <div id="p-nu" class="hide"><div class="card"><h2>Every linked number</h2><div class="hint" id="nuSum"></div><div class="scroll" style="margin-top:10px"><table class="tbl"><thead><tr><th>Number</th><th>From</th><th>State</th><th></th></tr></thead><tbody id="nt"></tbody></table></div></div></div>
   <div id="p-an" class="hide"><div class="grid"><div class="card"><h2>Post news</h2><label for="at">Title</label><input class="fld" id="at" maxlength="80"><label for="ab">Message</label><textarea class="fld" id="ab" maxlength="600"></textarea><div class="toggle"><div>📌 Pin to the top</div><label class="switch"><input type="checkbox" id="ap"><s></s></label></div><button class="btn" id="aGo">Publish</button></div><div class="card"><h2>Published</h2><div id="al"></div></div></div></div>
   <div id="p-tk" class="hide"><div class="card"><h2>Help requests</h2><div id="tl"></div></div></div>
+  <div id="p-wl" class="hide"><div class="card"><h2>Community wall</h2><div id="wl"></div></div></div>
+  <div id="p-pl" class="hide"><div class="grid"><div class="card"><h2>New poll</h2><label for="pq">Question</label><input class="fld" id="pq" maxlength="140"><label>Options (2 to 6)</label><input class="fld po" maxlength="60" placeholder="Option 1"><input class="fld po" maxlength="60" placeholder="Option 2"><input class="fld po" maxlength="60" placeholder="Option 3 (optional)"><input class="fld po" maxlength="60" placeholder="Option 4 (optional)"><button class="btn" id="pGo">Publish poll</button></div><div class="card"><h2>Polls</h2><div id="pls"></div></div></div></div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="/js/config.js"></script><script src="/js/app.js"></script><script src="/js/admin.js"></script>

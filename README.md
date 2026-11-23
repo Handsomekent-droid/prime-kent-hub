@@ -62,6 +62,13 @@ SSL in front of the port and use an `https://` URL (set `WEB_TRUST_PROXY=1` on t
 3. Upload the Build 29 bot zip over the old bot files and restart (keep `.env` and `data/`).
 New: Numbers tab (Control, Status, Reconnect, live status), Share tab (invite link, share card, install app), Help tab, News, `/commands` explorer, `/admin`.
 
+## Build 30 update steps
+New pages: `/projects` (edit `public/projects.json` to add your own bots and tools), `/tools` (fancy text, QR, wa.me links, image shrinker, short links, text tools, status ideas), `/community` (wall, polls, top inviters). New admin tabs: Wall and Polls.
+1. Supabase → SQL Editor → paste the whole `supabase/schema.sql` → Run (safe to re-run).
+2. Push the files to GitHub (Vercel redeploys). Keep your own `public/js/config.js`.
+3. Short links use `/s/<code>` (a rewrite in `vercel.json` and `api/go.js`). They only need the anon key.
+Abuse limits (enforced in the database): 1 wall post per 20 s, 280 characters, 50 short links per person. Short links need a signed-in account.
+
 ## Safety notes
 - Asking for a code makes WhatsApp notify that number. The bot limits requests (per user, per number, per hour) and every request needs a signed-in account.
 - Every person only sees/removes their own numbers (the bot derives the owner from the verified Supabase user id + your secret).

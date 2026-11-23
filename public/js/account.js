@@ -228,6 +228,8 @@
     const a = b.dataset.a; markAccent(a); document.documentElement.setAttribute('data-accent', a); try { localStorage.setItem('pk_accent', a); } catch {}
     if (await persist({ settings: { accent: a } })) toast('Accent saved ✓');
   }));
+  $('board').checked = !settings().hideBoard;
+  $('board').onchange = async () => { await persist({ settings: { hideBoard: !$('board').checked } }); toast('Saved ✓'); };
   $('calm').onchange = async () => { const on = $('calm').checked; document.documentElement.setAttribute('data-calm', on ? 'on' : 'off'); try { localStorage.setItem('pk_calm', on ? '1' : '0'); } catch {} await persist({ settings: { calm: on } }); };
   if (!providers.includes('email')) ['np', 'chgPw'].forEach((i) => $(i).classList.add('hide')), document.querySelector('label[for=np]').classList.add('hide');
   $('chgPw').onclick = async () => { const p = $('np').value; if (p.length < 8) return toast('Use at least 8 characters', 'err'); const { error } = await sb.auth.updateUser({ password: p }); toast(error ? error.message : 'Password changed ✓', error ? 'err' : ''); if (!error) $('np').value = ''; };
