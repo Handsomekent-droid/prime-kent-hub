@@ -60,6 +60,25 @@
     if (error) throw error;
   }
 
+  const ICON = {
+    projects: '<path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-6h-6v6H5a2 2 0 0 1-2-2z"/>',
+    pair: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+    tools: '<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
+    community: '<path d="M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.5A8 8 0 1 1 21 12z"/>',
+    account: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'
+  };
+  const TABS = [['projects', 'Home', '/projects'], ['tools', 'Tools', '/tools'], ['pair', 'Pair', '/pair'], ['community', 'Chat', '/community'], ['account', 'Me', '/account']];
+  function tabbar(active) {
+    if ($('tabbar')) return;
+    const bar = el('nav', { class: 'tabbar', id: 'tabbar', 'aria-label': 'Main' });
+    TABS.forEach(([k, label, href]) => {
+      const ic = el('i'); ic.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + ICON[k] + '</svg>';
+      const a = el('a', { href, class: (active === k ? 'on' : '') + (k === 'pair' ? ' fab' : '') }, ic, el('span', { text: label }));
+      a.addEventListener('click', () => { try { navigator.vibrate && navigator.vibrate(8); } catch {} });
+      bar.append(a);
+    });
+    document.body.append(bar);
+  }
   const NAV = [['projects', '🏠', 'Projects', '/projects'], ['pair', '🔗', 'Pair', '/pair'], ['tools', '🛠', 'Tools', '/tools'], ['community', '🌐', 'Community', '/community'], ['cmds', '📚', 'Commands', '/commands'], ['account', '👤', 'Account', '/account']];
   function nav(active, session, profile) {
     const u = session?.user; const name = profile?.display_name || displayName(u);
@@ -68,6 +87,8 @@
     header.append(el('a', { class: 'brand', href: '/' }, el('img', { src: '/img/logo.jpg', alt: '' }), el('div', {}, el('b', { text: 'PRIME KENT DEV HUB' }), el('small', { text: 'Nexora Nemesis Pairing' }))));
     NAV.forEach(([k, ic, tx, href]) => header.append(el('a', { class: 'l' + (active === k ? ' on' : ''), href }, ic + ' ', el('span', { text: tx }))));
     if (isAdm) header.append(el('a', { class: 'l' + (active === 'admin' ? ' on' : ''), href: '/admin' }, '🛡 ', el('span', { text: 'Admin' })));
+    header.append(el('a', { class: 'hbtn', href: '/commands', 'aria-label': 'Commands', text: '📚' }));
+    tabbar(active);
     if (!u) { header.append(el('a', { class: 'btn sm', href: '/', style: 'width:auto;margin:0;padding:9px 14px;text-decoration:none', text: 'Sign in' })); document.body.prepend(header); return; }
     const av = el('button', { class: 'av', 'aria-label': 'Account menu' });
     const pic = u?.user_metadata?.avatar_url || u?.user_metadata?.picture;
@@ -104,7 +125,15 @@
     } catch { return false; }
   }
 
+  // numbers that count up when they appear
+  function countUp(node) {
+    const to = parseInt(String(node.textContent).replace(/\D/g, ''), 10); if (!to || to > 100000) return;
+    const suffix = /\+\s*$/.test(node.textContent) ? '+' : ''; const t0 = performance.now(), dur = 900;
+    const tick = (t) => { const k = Math.min(1, (t - t0) / dur); node.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))) + (k === 1 ? suffix : ''); if (k < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  }
+
   function footer() { document.body.append(el('div', { class: 'foot', text: 'PRIME KENT DEV HUB · NEXORA NEMESIS 404 · DEV × PRIME × KILLER × KENT' })); }
 
-  window.Hub = { checkAdmin, install, canInstall: () => !!installEvt, cfg, sb, configured, $, el, toast, chrome, getSession, requireAuth, displayName, loadProfile, saveProfile, nav, signOut, api, applyPrefs, COUNTRIES, footer };
+  window.Hub = { countUp, checkAdmin, install, canInstall: () => !!installEvt, cfg, sb, configured, $, el, toast, chrome, getSession, requireAuth, displayName, loadProfile, saveProfile, nav, signOut, api, applyPrefs, COUNTRIES, footer };
 })();

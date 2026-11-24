@@ -8,6 +8,7 @@
   try { data = await (await fetch('/projects.json', { cache: 'no-cache' })).json(); } catch {}
   try { const c = await (await fetch('/commands.json')).json(); if (c.total) $('sCmd').textContent = c.total; } catch {}
   $('sProj').textContent = (data.projects || []).filter((p) => p.status !== 'soon').length;
+  document.querySelectorAll('.stat b').forEach((n) => Hub.countUp(n));
   const box = $('list');
   (data.projects || []).forEach((p) => {
     const links = el('div', { class: 'links' });

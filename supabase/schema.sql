@@ -1,4 +1,4 @@
--- Run this once in Supabase → SQL Editor.
+-- Run this once in Supabase -> SQL Editor.
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   display_name text,
@@ -175,7 +175,7 @@ language sql security definer set search_path = public as $$
 $$;
 grant execute on function public.poll_results(bigint) to authenticated;
 
--- top inviters (people can hide themselves in Account → Settings)
+-- top inviters (people can hide themselves in Account -> Settings)
 create or replace function public.top_inviters() returns table(name text, n integer)
 language sql security definer set search_path = public as $$
   select coalesce(p.display_name, 'Member') as name, count(r.id)::int as n

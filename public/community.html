@@ -1,10 +1,16 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Community — Prime Kent Dev Hub</title><meta name="theme-color" content="#07030f"><link rel="icon" href="/img/logo.jpg"><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/img/icon-192.png"><link rel="stylesheet" href="/css/style.css"></head><body>
 <div class="wrap">
-  <div class="card" style="padding:26px"><h1 class="t" style="font-size:clamp(24px,5vw,34px)">🌐 Community</h1><p class="hint" style="margin-top:6px">Be kind. Posts are public to every member. No spam, no insults, no scams.</p></div>
+  <div class="card" style="padding:26px"><h1 class="t" style="font-size:clamp(24px,5vw,34px)">🌐 Community</h1><p class="hint" style="margin-top:6px">A group chat for every member. Be kind. No spam, no insults, no scams.</p></div>
   <div class="tabs" id="tabs"><button class="on" data-p="wall">💬 Wall</button><button data-p="polls">🗳 Polls</button><button data-p="board">🏆 Top inviters</button></div>
 
-  <div id="p-wall"><div class="card"><textarea class="fld" id="pBody" maxlength="280" placeholder="What is on your mind?"></textarea><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span class="hint" id="pCnt">0 / 280</span><button class="btn" id="pGo" style="width:auto;margin:6px 0 0;padding:12px 26px">Post</button></div></div><div id="feed"></div></div>
+  <div id="p-wall"><div class="chat">
+    <div class="chead"><img src="/img/logo.jpg" alt=""><div><b>Prime Kent Dev Hub</b><small id="cSub">Community chat · be kind</small></div></div>
+    <div class="cpin hide" id="cPin"></div>
+    <div class="cmsgs" id="feed"></div>
+    <button class="cdown hide" id="cDown">↓ New messages</button>
+    <div class="ccomp"><textarea id="pBody" rows="1" maxlength="280" placeholder="Message"></textarea><button id="pGo" aria-label="Send">➤</button></div>
+  </div></div>
   <div id="p-polls" class="hide"><div id="pollBox"></div></div>
   <div id="p-board" class="hide"><div class="card"><h2>🏆 Top inviters</h2><p class="hint">Most friends who joined with an invite link. You can hide yourself in Account → Settings.</p><div id="lb"></div><a class="btn ghost" href="/account#share" style="display:block;text-align:center;text-decoration:none;margin-top:14px">🎁 Get my invite link</a></div></div>
 </div>
