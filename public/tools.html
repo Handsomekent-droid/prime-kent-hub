@@ -21,6 +21,18 @@
     <label>Quality: <b id="iQv">75</b>%</label><input type="range" id="iQ" min="30" max="95" value="75" style="width:100%">
     <div class="hint" id="iInfo"></div><img id="iPrev" alt="" style="max-width:100%;border-radius:12px;display:none;margin-top:8px"><button class="btn hide" id="iDl">Download</button></section>
 
+  <section id="t-imglink" class="card hide"><h2>🔗 Image → link</h2><p class="hint">Upload a picture and get a public link you can paste anywhere (status, bio, a chat).</p>
+    <div id="ilGuest" class="hide"><p class="hint">Sign in to upload images.</p><a class="btn" href="/?next=/tools" style="display:block;text-align:center;text-decoration:none">Sign in</a></div>
+    <div id="ilApp" class="hide">
+      <input class="fld" type="file" id="ilFile" accept="image/*">
+      <div class="hint" id="ilInfo"></div>
+      <img id="ilPrev" alt="" style="max-width:100%;border-radius:12px;display:none;margin-top:8px">
+      <button class="btn" id="ilGo">Upload</button>
+      <div id="ilOut"></div>
+      <div class="sub">My uploads</div><div id="ilList"></div>
+    </div>
+  </section>
+
   <section id="t-link" class="card hide"><h2>🔗 Short links</h2><div id="lGuest" class="hide"><p class="hint">Sign in to make short links.</p><a class="btn" href="/?next=/tools" style="display:block;text-align:center;text-decoration:none">Sign in</a></div>
     <div id="lApp" class="hide"><input class="fld" id="lUrl" type="url" placeholder="https://a-very-long-link.com/…"><input class="fld" id="lCode" maxlength="24" placeholder="Custom name (optional, letters and numbers)"><button class="btn" id="lGo">Shorten</button><div id="lOut"></div><div class="sub">My links</div><div id="lList"></div></div></section>
 

@@ -211,3 +211,69 @@ create trigger links_cap_t before insert on public.short_links for each row exec
 create or replace function public.link_click(c text) returns void
 language sql security definer set search_path = public as $$ update public.short_links set clicks = clicks + 1 where code = c; $$;
 grant execute on function public.link_click(text) to anon, authenticated;
+
+-- ===== Build 31: image -> link tool (Supabase Storage, public bucket, per-user folders) =====
+insert into storage.buckets (id, name, public) values ('uploads', 'uploads', true) on conflict (id) do nothing;
+
+drop policy if exists "uploads read" on storage.objects;
+create policy "uploads read" on storage.objects for select using (bucket_id = 'uploads');
+drop policy if exists "uploads insert own" on storage.objects;
+create policy "uploads insert own" on storage.objects for insert to authenticated with check (bucket_id = 'uploads' and (storage.foldername(name))[1] = auth.uid()::text);
+drop policy if exists "uploads delete own" on storage.objects;
+create policy "uploads delete own" on storage.objects for delete to authenticated using (bucket_id = 'uploads' and (storage.foldername(name))[1] = auth.uid()::text);
+
+-- tracks each upload so the tool can list/delete "my uploads" (the storage object itself is removed separately, from the browser)
+create table if not exists public.image_links (
+  path text primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  size integer not null default 0,
+  created_at timestamptz not null default now()
+);
+alter table public.image_links enable row level security;
+drop policy if exists "read own image links" on public.image_links;
+drop policy if exists "insert own image link" on public.image_links;
+drop policy if exists "delete own image link" on public.image_links;
+create policy "read own image links" on public.image_links for select to authenticated using (auth.uid() = user_id);
+create policy "insert own image link" on public.image_links for insert to authenticated with check (auth.uid() = user_id);
+create policy "delete own image link" on public.image_links for delete to authenticated using (auth.uid() = user_id);
+-- at most 30 uploaded images per person
+create or replace function public.image_links_cap() returns trigger language plpgsql as $$
+begin
+  if (select count(*) from public.image_links where user_id = new.user_id) >= 30 then raise exception 'You can keep up to 30 uploaded images. Delete one first.'; end if;
+  return new;
+end $$;
+drop trigger if exists image_links_cap_t on public.image_links;
+create trigger image_links_cap_t before insert on public.image_links for each row execute function public.image_links_cap();
+
+-- ===== Build 31: WhatsApp-style multi-emoji reactions on wall posts (one group, replaces the old heart-only like) =====
+create table if not exists public.post_reactions (
+  post_id bigint not null references public.posts(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  emoji text not null check (emoji in ('❤️','😂','😮','😢','🙏','👍')),
+  created_at timestamptz not null default now(),
+  primary key (post_id, user_id)
+);
+alter table public.post_reactions enable row level security;
+drop policy if exists "read reactions" on public.post_reactions;
+create policy "read reactions" on public.post_reactions for select to authenticated using (true);
+
+-- tap an emoji: sets it, tapping the same one again removes it. keeps posts.likes as the total count (old column, still shown in a couple of places).
+create or replace function public.react(pid bigint, e text) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare existing text; counts jsonb; mine text;
+begin
+  if auth.uid() is null then raise exception 'sign in first'; end if;
+  if e is null or e not in ('❤️','😂','😮','😢','🙏','👍') then raise exception 'bad emoji'; end if;
+  select emoji into existing from post_reactions where post_id = pid and user_id = auth.uid();
+  if existing is not null and existing = e then
+    delete from post_reactions where post_id = pid and user_id = auth.uid(); mine := null;
+  else
+    insert into post_reactions (post_id, user_id, emoji) values (pid, auth.uid(), e)
+    on conflict (post_id, user_id) do update set emoji = excluded.emoji, created_at = now();
+    mine := e;
+  end if;
+  select coalesce(jsonb_object_agg(emoji, n), '{}'::jsonb) into counts from (select emoji, count(*)::int n from post_reactions where post_id = pid group by emoji) t;
+  update posts set likes = (select count(*) from post_reactions where post_id = pid) where id = pid;
+  return jsonb_build_object('counts', counts, 'mine', mine);
+end $$;
+grant execute on function public.react(bigint, text) to authenticated;

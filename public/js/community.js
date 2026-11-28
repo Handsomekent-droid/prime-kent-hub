@@ -34,14 +34,22 @@
   $('pBody').onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey && !matchMedia('(pointer:coarse)').matches) { e.preventDefault(); send(); } };
   let openBubble = null;
 
+  const EMOJIS = ['❤️', '👍', '😂', '😮', '😢', '🙏'];
   async function loadFeed(force) {
     const { data, error } = await sb.from('posts').select('*').order('created_at', { ascending: false }).limit(60);
     if (error) { feed.textContent = ''; return feed.append(el('div', { class: 'cempty', text: 'The chat turns on after the new SQL is run.' })); }
     const rows = (data || []).slice().reverse();
     const s2 = rows.map((p) => p.id + ':' + p.likes).join(',');
     if (!force && s2 === sig) return; sig = s2;
-    let mine = new Set();
-    try { const r = await sb.from('post_likes').select('post_id').in('post_id', rows.map((p) => p.id)); mine = new Set((r.data || []).map((x) => x.post_id)); } catch {}
+    const ids = rows.map((p) => p.id);
+    let counts = {}, mine = {};
+    try {
+      const r = await sb.from('post_reactions').select('post_id,user_id,emoji').in('post_id', ids);
+      (r.data || []).forEach((x) => {
+        (counts[x.post_id] = counts[x.post_id] || {})[x.emoji] = (counts[x.post_id]?.[x.emoji] || 0) + 1;
+        if (x.user_id === user.id) mine[x.post_id] = x.emoji;
+      });
+    } catch {}
     const stick = nearBottom() || !feed.childElementCount, grew = rows.length > lastCount && lastCount > 0; lastCount = rows.length;
     feed.textContent = ''; openBubble = null;
     if (!rows.length) return feed.append(el('div', { class: 'cempty', text: 'No messages yet. Say hi 👋' }));
@@ -57,14 +65,16 @@
       const bub = el('div', { class: 'cb' });
       if (!same && !meMsg) bub.append(el('div', { class: 'nm', style: 'color:' + colorOf(p.user_id), text: p.author }));
       bub.append(el('div', { class: 'tx', text: p.body }), el('div', { class: 'tm' }, el('span', { text: hm(p.created_at) })));
-      if (p.likes > 0) bub.append(el('div', { class: 'rx', text: '❤️ ' + p.likes }));
-      const doLike = async () => { const { data: r, error: e } = await sb.rpc('toggle_like', { pid: p.id }); if (e || !r) return toast('Could not react', 'err'); loadFeed(true); };
-      const acts = el('div', { class: 'cact' }, el('button', { text: mine.has(p.id) ? '💔 Unlike' : '❤️ Like', onclick: (e) => { e.stopPropagation(); doLike(); } }));
+      const pc = counts[p.id] || {};
+      const pairs = Object.entries(pc).sort((a, b) => b[1] - a[1]);
+      if (pairs.length) bub.append(el('div', { class: 'rxrow' }, ...pairs.map(([e, n]) => el('span', { text: e + ' ' + n }))));
+      const doReact = async (e) => { const { data: r, error: err } = await sb.rpc('react', { pid: p.id, e }); if (err || !r) return toast('Could not react', 'err'); loadFeed(true); };
+      const acts = el('div', { class: 'cact' }, ...EMOJIS.map((e) => el('button', { class: 'react' + (mine[p.id] === e ? ' on' : ''), text: e, onclick: (ev) => { ev.stopPropagation(); doReact(e); } })));
       if (meMsg) acts.append(el('button', { text: '🗑 Delete', onclick: async (e) => { e.stopPropagation(); if (!confirm('Delete your message?')) return; await sb.from('posts').delete().eq('id', p.id); loadFeed(true); } }));
       bub.append(acts);
       bub.onclick = () => { if (openBubble && openBubble !== bub) openBubble.classList.remove('open'); bub.classList.toggle('open'); openBubble = bub.classList.contains('open') ? bub : null; };
-      bub.ondblclick = (e) => { e.preventDefault(); doLike(); };
-      feed.append(el('div', { class: 'crow' + (meMsg ? ' me' : '') + (same ? '' : ' gap') + (p.likes > 0 ? ' hasrx' : '') }, av, bub));
+      bub.ondblclick = (e) => { e.preventDefault(); doReact('❤️'); };
+      feed.append(el('div', { class: 'crow' + (meMsg ? ' me' : '') + (same ? '' : ' gap') + (pairs.length ? ' hasrx' : '') }, av, bub));
     });
     if (stick) toBottom(false); else if (grew) $('cDown').classList.remove('hide');
   }

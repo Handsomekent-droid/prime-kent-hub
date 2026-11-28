@@ -193,11 +193,10 @@
       if (typeof data === 'number') {
         $('refN').textContent = data;
         const progN = $('refProgN'); if (progN) progN.textContent = data;
-        const milestones = [5, 10, 20, 50, 100];
-        const next = milestones.find((m) => m > data) || (Math.ceil((data + 1) / 50) * 50);
-        const nextN = $('refNextN'); if (nextN) nextN.textContent = next;
+        const next = data >= 50 ? null : (Math.floor(data / 5) + 1) * 5;
+        const nextN = $('refNextN'); if (nextN) nextN.textContent = next || 50;
         const bar = $('refBar');
-        if (bar) { const i = bar.querySelector('i'); if (i) i.style.width = Math.min(100, Math.round((data / next) * 100)) + '%'; }
+        if (bar) { const i = bar.querySelector('i'); if (i) i.style.width = (next ? Math.min(100, Math.round((data / next) * 100)) : 100) + '%'; }
       }
     } catch {}
   })();

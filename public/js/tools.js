@@ -7,11 +7,11 @@
   const copy = async (t, btn) => { try { await navigator.clipboard.writeText(t); toast('Copied ✓'); if (btn) { const o = btn.textContent; btn.textContent = '✓'; setTimeout(() => (btn.textContent = o), 1200); } } catch { toast('Select the text and copy it by hand', 'err'); } };
 
   /* chips */
-  const TOOLS = [['style', '✨ Fancy text'], ['qr', '📱 QR code'], ['wa', '💬 WhatsApp link'], ['img', '🖼 Image shrink'], ['link', '🔗 Short links'], ['text', '🔤 Text tools'], ['idea', '🎲 Status ideas']];
+  const TOOLS = [['style', '✨ Fancy text'], ['qr', '📱 QR code'], ['wa', '💬 WhatsApp link'], ['img', '🖼 Image shrink'], ['imglink', '🔗 Image → link'], ['link', '🔗 Short links'], ['text', '🔤 Text tools'], ['idea', '🎲 Status ideas']];
   function show(k) {
     TOOLS.forEach(([x]) => $('t-' + x).classList.toggle('hide', x !== k));
     [...$('chips').children].forEach((b, i) => b.classList.toggle('on', TOOLS[i][0] === k));
-    if (k === 'qr') drawQr(); if (k === 'link') loadLinks();
+    if (k === 'qr') drawQr(); if (k === 'link') loadLinks(); if (k === 'imglink') loadImgLinks();
     try { history.replaceState(null, '', '#' + k); } catch {}
   }
   TOOLS.forEach(([k, t]) => $('chips').append(el('button', { text: t, onclick: () => show(k) })));
@@ -117,6 +117,58 @@
     $('lUrl').value = ''; $('lCode').value = ''; toast('Short link made ✓');
     const cp = el('button', { class: 'mini', text: 'Copy', onclick: () => copy(base + code, cp) });
     $('lOut').textContent = ''; $('lOut').append(el('div', { class: 'out' }, el('span', { text: base + code }), cp)); loadLinks();
+  };
+
+  /* ---------- image -> link ---------- */
+  $((session ? 'ilApp' : 'ilGuest')).classList.remove('hide');
+  let ilBlob = null, ilExt = 'jpg';
+  async function ilPrep() {
+    const f = $('ilFile').files && $('ilFile').files[0]; if (!f) return;
+    const url = URL.createObjectURL(f);
+    try {
+      const im = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = url; });
+      const k = Math.min(1, 1600 / Math.max(im.width, im.height));
+      const c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+      const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height);
+      ilBlob = await new Promise((ok) => c.toBlob(ok, 'image/jpeg', 0.85)); ilExt = 'jpg';
+      $('ilInfo').textContent = `${c.width}×${c.height} · ${kb(ilBlob.size)}`;
+      $('ilPrev').src = URL.createObjectURL(ilBlob); $('ilPrev').style.display = 'block';
+    } catch { toast('Could not read that picture', 'err'); } finally { URL.revokeObjectURL(url); }
+  }
+  $('ilFile').onchange = ilPrep;
+  async function loadImgLinks() {
+    if (!session) return;
+    const { data, error } = await sb.from('image_links').select('*').order('created_at', { ascending: false }).limit(30);
+    const box = $('ilList'); box.textContent = '';
+    if (error) return box.append(el('div', { class: 'hint', text: 'Image links turn on after the new SQL is run.' }));
+    if (!data.length) return box.append(el('div', { class: 'hint', text: 'No uploads yet.' }));
+    data.forEach((r) => {
+      const url = sb.storage.from('uploads').getPublicUrl(r.path).data.publicUrl;
+      const cp = el('button', { class: 'mini', text: 'Copy', onclick: () => copy(url, cp) });
+      const del = el('button', { class: 'mini bad', text: 'Delete', onclick: async () => {
+        if (!confirm('Delete this picture? The link will stop working.')) return;
+        try { await sb.storage.from('uploads').remove([r.path]); } catch {}
+        await sb.from('image_links').delete().eq('path', r.path); loadImgLinks();
+      } });
+      box.append(el('div', { class: 'out' }, el('span', {}, document.createTextNode(url), el('div', { class: 'hint', text: `${kb(r.size)} · ${new Date(r.created_at).toLocaleDateString()}` })), cp, del));
+    });
+  }
+  $('ilGo').onclick = async () => {
+    if (!session) return toast('Sign in first', 'err');
+    if (!ilBlob) return toast('Choose a picture first', 'err');
+    $('ilGo').disabled = true; $('ilGo').textContent = 'Uploading…';
+    try {
+      const path = `${session.user.id}/${Date.now()}-${rnd()}.${ilExt}`;
+      const { error: upErr } = await sb.storage.from('uploads').upload(path, ilBlob, { contentType: 'image/jpeg', upsert: false });
+      if (upErr) throw upErr;
+      const { error: dbErr } = await sb.from('image_links').insert({ path, user_id: session.user.id, size: ilBlob.size });
+      if (dbErr) { try { await sb.storage.from('uploads').remove([path]); } catch {} throw dbErr; }
+      const url = sb.storage.from('uploads').getPublicUrl(path).data.publicUrl;
+      const cp = el('button', { class: 'mini', text: 'Copy', onclick: () => copy(url, cp) });
+      $('ilOut').textContent = ''; $('ilOut').append(el('div', { class: 'out' }, el('span', { text: url }), cp));
+      toast('Uploaded ✓'); loadImgLinks();
+    } catch (e) { toast(/up to 30/i.test(e.message || '') ? e.message : 'Could not upload. Try a smaller picture.', 'err'); }
+    finally { $('ilGo').disabled = false; $('ilGo').textContent = 'Upload'; }
   };
 
   /* ---------- text tools ---------- */

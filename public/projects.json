@@ -24,10 +24,25 @@
       "links": [{ "label": "Join in", "href": "/community", "primary": true }]
     },
     {
-      "icon": "🚀", "name": "More coming soon", "tag": "In the works", "status": "soon",
-      "desc": "New bots and tools are on the way. Follow the channel to be first to know.",
-      "features": [],
-      "links": [{ "label": "Follow the channel", "href": "@channel" }]
+      "icon": "☠️", "name": "『𖤍ᴏᴠ』𝐍Ξ𝐗𝐎𝐑𝐀 𝐕Ø𝐈𝐃𝐑Ξ𝐀𝐏Ξ𝐑⁴⁰⁴ ☠︎", "tag": "WhatsApp bot", "status": "soon",
+      "desc": "The next Nexora build. In the works — follow the channel to be first to know when it drops.",
+      "features": [], "links": [{ "label": "Follow the channel", "href": "@channel" }]
+    },
+    {
+      "icon": "🐛", "name": "𖤍ᴘʀɪᴍᴇ〆ᴠᴇɴᴏᴍ ᴠ1 ᴄʀᴀsʜᴇʀ ʙᴜɢ", "tag": "WhatsApp bot", "status": "soon",
+      "desc": "Coming soon.", "features": [], "links": [{ "label": "Follow the channel", "href": "@channel" }]
+    },
+    {
+      "icon": "🐛", "name": "𖤍 PRIME VENOM V1 CRASHER BUG 𖤍v2", "tag": "WhatsApp bot", "status": "soon",
+      "desc": "Coming soon.", "features": [], "links": [{ "label": "Follow the channel", "href": "@channel" }]
+    },
+    {
+      "icon": "👑", "name": "꧁ Lᴏʀᴅᴇss Cʀᴀsʜᴇʀ ꧂", "tag": "WhatsApp bot", "status": "soon",
+      "desc": "Coming soon.", "features": [], "links": [{ "label": "Follow the channel", "href": "@channel" }]
+    },
+    {
+      "icon": "🚀", "name": "Exodile xd", "tag": "WhatsApp bot", "status": "soon",
+      "desc": "Coming soon.", "features": [], "links": [{ "label": "Follow the channel", "href": "@channel" }]
     }
   ]
 }

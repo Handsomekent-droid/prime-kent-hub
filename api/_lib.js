@@ -29,14 +29,35 @@ async function getUser(req) {
 
 const clientIp = (req) => String(req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '').split(',')[0].trim().slice(0, 64);
 
+// How many extra pairing slots this user has earned by inviting friends.
+// Every 5 confirmed referrals = +2 slots, capped at +20 bonus (10 default + 20 = 30 max, matching the bot's own ceiling).
+async function referralBonus(req) {
+  const auth = String(req.headers.authorization || '');
+  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+  if (!token || !env('SUPABASE_URL') || !env('SUPABASE_ANON_KEY')) return 0;
+  try {
+    const r = await fetch(`${env('SUPABASE_URL')}/rest/v1/rpc/referral_count`, {
+      method: 'POST',
+      headers: { apikey: env('SUPABASE_ANON_KEY'), Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: '{}',
+      signal: AbortSignal.timeout(8000)
+    });
+    if (!r.ok) return 0;
+    const n = Number(await r.json()) || 0;
+    return Math.min(20, Math.floor(n / 5) * 2);
+  } catch { return 0; }
+}
+
 // Calls the bot's /hub/* API on the Pterodactyl server.
-async function bot(path, { method = 'GET', body, user, ip, admin } = {}) {
+// `maxHeader`, when set, asks the bot to raise this user's pairing-slot cap (e.g. a referral reward).
+// The bot clamps it itself (never below its own default, never above 30), so a bad value here is harmless.
+async function bot(path, { method = 'GET', body, user, ip, admin, maxHeader } = {}) {
   const base = env('BOT_API_URL').replace(/\/+$/, '');
   if (!base || env('BOT_API_SECRET').length < 16) return { status: 500, data: { ok: false, msg: 'The website is not connected to the bot yet (BOT_API_URL / BOT_API_SECRET missing).' } };
   try {
     const r = await fetch(base + path, {
       method,
-      headers: { 'Content-Type': 'application/json', 'x-hub-secret': env('BOT_API_SECRET'), 'x-hub-user': user.id, 'x-hub-ip': ip || '', ...(admin ? { 'x-hub-admin': '1' } : {}) },
+      headers: { 'Content-Type': 'application/json', 'x-hub-secret': env('BOT_API_SECRET'), 'x-hub-user': user.id, 'x-hub-ip': ip || '', ...(admin ? { 'x-hub-admin': '1' } : {}), ...(maxHeader ? { 'x-hub-max': String(maxHeader) } : {}) },
       body: body ? JSON.stringify(body) : undefined,
       signal: AbortSignal.timeout(15000)
     });
@@ -77,4 +98,4 @@ async function supa(path, { method = 'GET', body, prefer } = {}) {
   } catch { return { ok: false, status: 502, data: { msg: 'Supabase did not answer.' } }; }
 }
 
-module.exports = { env, send, getUser, clientIp, bot, handler, isAdmin, supa };
+module.exports = { env, send, getUser, clientIp, bot, handler, isAdmin, supa, referralBonus };
