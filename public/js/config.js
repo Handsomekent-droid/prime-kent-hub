@@ -8,5 +8,5 @@ window.HUB = {
   BRAND: 'Prime Kent Dev Hub',
   PRODUCT: 'Nexora Nemesis Pairing',
   CHANNEL: 'https://whatsapp.com/channel/0029VbE8mE75Ui2ayfBnZv3s',
-  TELEGRAM: 'https://t.me/exodile'
+  TELEGRAM: 'https://t.me/NexoraNemesisXBot'
 };

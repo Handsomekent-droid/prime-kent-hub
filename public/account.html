@@ -9,8 +9,37 @@
   <div class="tabs" id="tabs" style="margin-top:18px"><button class="on" data-p="profile">👤 Profile</button><button data-p="numbers">🔗 Numbers</button><button data-p="share">🎁 Share</button><button data-p="help">💬 Help</button><button data-p="settings">⚙️ Settings</button></div>
 
   <div id="p-profile">
+    <div class="card" id="heroCard">
+      <span class="pill" id="statusPill">⚡ Active</span>
+      <div class="herostat"><span class="coin">⚡</span><b id="heroNum">0</b></div>
+      <div class="hint">Commands run across your numbers</div>
+      <div class="qa" id="qa">
+        <a class="qabtn" href="/pair"><i>🔗</i><span>Pair</span></a>
+        <button class="qabtn" type="button" data-p="share"><i>🎁</i><span>Share</span></button>
+        <button class="qabtn" type="button" data-p="help"><i>💬</i><span>Help</span></button>
+      </div>
+    </div>
+
     <div class="card hide" id="newsCard"><h2>📣 News</h2><div id="news"></div></div>
-    <div class="grid">
+
+    <div class="card" style="margin-top:18px"><h2>🔐 Whitelist status</h2>
+      <div class="wl-row"><div><b id="wlCount">0 / 10</b><span class="hint">Numbers paired</span></div><span class="pill" id="wlStatus">⚪ No numbers yet</span></div>
+    </div>
+
+    <div class="promo2" style="margin-top:18px" id="promoGrid"></div>
+
+    <div class="card" style="margin-top:18px"><h2>🎁 Invite progress</h2>
+      <div class="bar" id="refBar"><i style="width:0%"></i><span><b id="refProgN">0</b>&nbsp;friends joined · next milestone at <b id="refNextN">5</b></span></div>
+      <button class="btn ghost" type="button" data-p="share" style="margin-top:14px">Share your invite link</button>
+    </div>
+
+    <div class="card" style="margin-top:18px"><h2>🏆 Your stats</h2>
+      <div class="ogwrap"><div class="ogring" id="ogRing"><span id="ogPct">0%</span></div>
+        <div><b id="memberSince" style="font:800 17px Orbitron,sans-serif;display:block"></b><span class="hint" id="ogHint">Member since —</span></div>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-top:18px">
       <div class="card"><h2>Account info</h2><div class="kv" id="kv"></div></div>
       <div class="card"><h2>Quick stats</h2><div class="stats"><div class="stat"><b id="sUsed">0</b><span>Linked</span></div><div class="stat"><b id="sOn">0</b><span>Online</span></div><div class="stat"><b id="sMax">10</b><span>Max</span></div></div><a class="btn" href="/pair" style="display:block;text-align:center;text-decoration:none">🔗 Pair a number</a></div>
     </div>

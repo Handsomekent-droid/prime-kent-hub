@@ -32,6 +32,35 @@
     if (p === 'help') loadTickets();
   }
   document.querySelectorAll('#tabs button').forEach((b) => (b.onclick = () => tab(b.dataset.p)));
+  document.querySelectorAll('[data-p]').forEach((b) => { if (!b.onclick) b.onclick = () => tab(b.dataset.p); });
+
+  /* ---------- OG ring (how long you've been with the hub) ---------- */
+  (() => {
+    const joinedAt = new Date(user.created_at);
+    const days = Math.max(0, Math.round((Date.now() - joinedAt.getTime()) / 86400000));
+    const pct = Math.min(100, Math.round((days / 365) * 100));
+    const ring = $('ogRing'); if (ring) ring.style.setProperty('--p', pct);
+    const pctEl = $('ogPct'); if (pctEl) pctEl.textContent = pct + '%';
+    const ms = $('memberSince'); if (ms) ms.textContent = joinedAt.toLocaleDateString(undefined, { year: 'numeric', month: 'short' });
+    const h = $('ogHint'); if (h) h.textContent = `${days} day${days === 1 ? '' : 's'} with Prime Kent Dev Hub`;
+  })();
+
+  /* ---------- promo grid (real links, no fake features) ---------- */
+  (() => {
+    const grid = $('promoGrid'); if (!grid) return;
+    const tiles = [
+      ['g1', '📡', 'WhatsApp Channel', 'Updates & drops', Hub.cfg.CHANNEL],
+      ['g2', '✈️', 'Telegram', 'Join the chat', Hub.cfg.TELEGRAM],
+      ['g3', '📚', 'Commands', 'Browse all 440+', '/commands'],
+      ['g4', '🌐', 'Community', 'Vote & chat', '/community']
+    ];
+    tiles.forEach(([g, ic, t, sub, href]) => {
+      if (!href) return;
+      const external = /^https?:\/\//.test(href);
+      grid.append(el('a', { class: 'ptile ' + g, href, ...(external ? { target: '_blank', rel: 'noopener' } : {}) },
+        el('span', { class: 'ic', text: ic }), el('b', { text: t }), el('small', { text: sub })));
+    });
+  })();
 
   /* small modal helper */
   function modal(title, ...content) {
@@ -50,6 +79,12 @@
     const d = await api('my'); const list = $('list'); list.textContent = '';
     const s = d.sessions || []; const max = d.max || 10;
     $('sUsed').textContent = s.length; $('sMax').textContent = max; $('sOn').textContent = s.filter((x) => x.state === 'connected').length;
+    const onCount = s.filter((x) => x.state === 'connected').length;
+    const totalCmd = s.reduce((a, x) => a + (x.commands || 0), 0);
+    const heroNum = $('heroNum'); if (heroNum) { heroNum.textContent = totalCmd; Hub.countUp(heroNum); }
+    const wlCount = $('wlCount'); if (wlCount) wlCount.textContent = `${s.length} / ${max}`;
+    const wlStatus = $('wlStatus'); if (wlStatus) wlStatus.textContent = onCount ? '✅ Active' : (s.length ? '🟡 Linking' : '⚪ No numbers yet');
+    const statusPill = $('statusPill'); if (statusPill) statusPill.textContent = onCount ? '⚡ Active' : (s.length ? '🟡 Pairing' : '⚪ Get started');
     if (!d.ok) return list.append(el('div', { class: 'hint', text: d.msg || 'Could not load your numbers.' }));
     if (!s.length) list.append(el('div', { class: 'hint', text: 'No numbers linked yet.' }));
     s.forEach((x) => {
@@ -152,7 +187,20 @@
   const link = location.origin + (refCode ? '/?ref=' + refCode : '/');
   $('refLink').value = refCode ? link : location.origin;
   if (!refCode) $('refHint').textContent = 'Share the website link with your friends. (Invite counting turns on after the new SQL is run.)';
-  (async () => { try { const { data } = await sb.rpc('referral_count'); if (typeof data === 'number') $('refN').textContent = data; } catch {} })();
+  (async () => {
+    try {
+      const { data } = await sb.rpc('referral_count');
+      if (typeof data === 'number') {
+        $('refN').textContent = data;
+        const progN = $('refProgN'); if (progN) progN.textContent = data;
+        const milestones = [5, 10, 20, 50, 100];
+        const next = milestones.find((m) => m > data) || (Math.ceil((data + 1) / 50) * 50);
+        const nextN = $('refNextN'); if (nextN) nextN.textContent = next;
+        const bar = $('refBar');
+        if (bar) { const i = bar.querySelector('i'); if (i) i.style.width = Math.min(100, Math.round((data / next) * 100)) + '%'; }
+      }
+    } catch {}
+  })();
   $('refCopy').onclick = async () => { try { await navigator.clipboard.writeText($('refLink').value); $('refCopy').textContent = 'Copied ✓'; } catch { $('refLink').select(); toast('Press copy on your keyboard', 'err'); } setTimeout(() => ($('refCopy').textContent = 'Copy'), 1500); };
   $('refShare').onclick = async () => { const t = 'Link your WhatsApp to Nexora Nemesis 404 MD, free:'; if (navigator.share) { try { await navigator.share({ title: 'Prime Kent Dev Hub', text: t, url: link }); } catch {} } else $('refCopy').click(); };
   const showInstall = () => { if (Hub.canInstall()) $('instCard').classList.remove('hide'); };
